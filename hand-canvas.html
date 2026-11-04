@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <title>HandCanvas — Menggambar dengan Tangan</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--panel:#121a2d;--line:#26334d;--muted:#94a3b8;--text:#f4f7ff;--accent:#66e3c4}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1b2c46 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;padding:24px}
+    .app{max-width:1200px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:13px}.logo{display:grid;place-items:center;width:45px;height:45px;border-radius:14px;background:#193b42;color:var(--accent);font-size:24px}.brand h1{font-size:20px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}.camera-btn,.tool{border:1px solid var(--line);border-radius:12px;background:#172138;color:var(--text);padding:10px 14px;font:inherit;cursor:pointer;transition:.15s}.camera-btn{background:var(--accent);border-color:var(--accent);color:#071713;font-weight:700}.camera-btn:hover{filter:brightness(1.08)}button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px}.workspace,.side{border:1px solid var(--line);background:#10182a;border-radius:18px;overflow:hidden}.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:12px;border-bottom:1px solid var(--line)}.tool{padding:8px 11px;font-size:13px}.tool.active{border-color:var(--accent);background:#163a3a;color:var(--accent)}.separator{height:28px;width:1px;background:var(--line);margin:0 3px}.colors{display:flex;align-items:center;gap:7px}.swatch{width:26px;height:26px;border-radius:50%;border:2px solid #ffffff35;cursor:pointer;padding:0}.swatch.selected{outline:2px solid white;outline-offset:2px}.swatch[data-color="#ffffff"]{border-color:#aab4c5}.size{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.size input{width:95px;accent-color:var(--accent)}.canvas-wrap{position:relative;height:min(68vh,650px);min-height:360px;background:#f8fafc;overflow:hidden;touch-action:none}.canvas-wrap canvas{position:absolute;inset:0;width:100%;height:100%}#cursor{position:absolute;z-index:3;width:20px;height:20px;border:2px solid #08131f;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;display:none;box-shadow:0 0 0 3px #ffffffa8}#cursor.pinch{background:#66e3c4;width:14px;height:14px}.canvas-caption{padding:10px 14px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.side{padding:14px;display:flex;flex-direction:column;gap:13px}.side h2{font-size:14px;margin:0}.preview{position:relative;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:#080d17;border:1px solid var(--line)}.preview video,.preview canvas{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.preview canvas{position:absolute;inset:0}.camera-placeholder{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:13px;padding:20px}.status{display:flex;align-items:center;gap:8px;padding:10px 11px;background:#0b1322;border-radius:10px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#64748b;flex:none}.dot.on{background:#50e3b4;box-shadow:0 0 10px #50e3b4}.instructions{border-top:1px solid var(--line);padding-top:12px}.instructions h2{margin-bottom:9px}.instructions ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px}.instructions li{margin:7px 0}.shortcuts{margin-top:auto;color:#73819a;font-size:11px}.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);opacity:0;background:#172138;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13px;pointer-events:none;transition:.2s;z-index:5}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:850px){body{padding:14px}.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:minmax(180px,1fr) 1fr}.instructions{border:0;padding:0}.shortcuts{grid-column:1/-1}.canvas-wrap{height:58vh}}@media(max-width:560px){.top{align-items:flex-start}.brand p{max-width:210px}.camera-btn{font-size:12px;padding:9px}.side{display:flex}.preview{max-height:190px}.canvas-wrap{min-height:300px}.toolbar{gap:7px}.separator{display:none}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="top"><div class="brand"><div class="logo">✋</div><div><h1>HandCanvas</h1><p>Gambar dan kendalikan kanvas dengan gerakan tangan</p></div></div><button id="cameraBtn" class="camera-btn">Aktifkan kamera</button></header>
+  <section class="layout">
+    <div class="workspace">
+      <div class="toolbar" aria-label="Alat gambar">
+        <button class="tool active" data-tool="draw" title="Gambar">✎ Gambar</button><button class="tool" data-tool="erase" title="Penghapus">⌫ Hapus</button>
+        <span class="separator"></span><div class="colors" aria-label="Warna kuas">
+          <button class="swatch selected" style="background:#111827" data-color="#111827" aria-label="Hitam"></button><button class="swatch" style="background:#ef476f" data-color="#ef476f" aria-label="Merah muda"></button><button class="swatch" style="background:#ff9f1c" data-color="#ff9f1c" aria-label="Oranye"></button><button class="swatch" style="background:#ffd166" data-color="#ffd166" aria-label="Kuning"></button><button class="swatch" style="background:#06d6a0" data-color="#06d6a0" aria-label="Hijau"></button><button class="swatch" style="background:#118ab2" data-color="#118ab2" aria-label="Biru"></button><button class="swatch" style="background:#7b61ff" data-color="#7b61ff" aria-label="Ungu"></button><button class="swatch" style="background:#fff" data-color="#ffffff" aria-label="Putih"></button>
+        </div><span class="separator"></span><label class="size">Ukuran <input id="brushSize" type="range" min="1" max="36" value="4"><span id="sizeValue">4</span></label>
+        <span class="separator"></span><button id="undoBtn" class="tool" title="Urungkan">↶ Urungkan</button><button id="clearBtn" class="tool" title="Bersihkan kanvas">Bersihkan</button><button id="saveBtn" class="tool" title="Simpan gambar">↓ Simpan</button>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap"><canvas id="paint"></canvas><div id="cursor"></div></div>
+      <div class="canvas-caption"><span id="hint">Aktifkan kamera untuk mulai. Cubit ibu jari dan telunjuk untuk menggambar.</span><span id="coords">Kanvas kosong</span></div>
+    </div>
+    <aside class="side">
+      <h2>Pratinjau kamera</h2><div class="preview"><video id="video" autoplay playsinline muted></video><canvas id="landmarks"></canvas><div class="camera-placeholder" id="placeholder">Kamera belum aktif</div></div>
+      <div class="status"><span class="dot" id="dot"></span><span id="statusText">Kamera belum diaktifkan</span></div>
+      <div class="instructions"><h2>Cara menggunakan</h2><ul><li>Arahkan telunjuk untuk menggerakkan kursor di kanvas.</li><li>Satukan ibu jari dan telunjuk untuk mulai menggambar.</li><li>Di atas tombol atau warna, lakukan cubitan singkat untuk memilihnya.</li><li>Buka telapak tangan untuk berhenti menggambar dan memindahkan kursor.</li></ul></div>
+      <div class="shortcuts">Kamera diproses langsung di browser. Video tidak disimpan atau dikirim.</div>
+    </aside>
+  </section>
+</main><div class="toast" id="toast"></div>
+<script type="module">
+  import { FilesetResolver, HandLandmarker } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm';
+  const $=s=>document.querySelector(s), canvas=$('#paint'), ctx=canvas.getContext('2d'), wrap=$('#canvasWrap'), video=$('#video'), landmarkCanvas=$('#landmarks'), lctx=landmarkCanvas.getContext('2d');
+  let landmarker,stream,active=false,lastPoint=null,isPinching=false,lastPinchTime=0,lastDrawPoint=null,brushColor='#111827',brushSize=4,tool='draw',frames=0,history=[],lastSaved=0,smoothedPoint=null,gestureAction=false;
+  const cursor=$('#cursor');
+  function resize(){const r=wrap.getBoundingClientRect(),dpr=window.devicePixelRatio||1,old=document.createElement('canvas');old.width=canvas.width;old.height=canvas.height;if(old.width&&old.height)old.getContext('2d').drawImage(canvas,0,0);canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineCap='round';ctx.lineJoin='round';if(old.width&&old.height)ctx.drawImage(old,0,0,old.width,old.height,0,0,r.width,r.height)}
+  new ResizeObserver(resize).observe(wrap);resize();
+  function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+  function setStatus(s,on=false){$('#statusText').textContent=s;$('#dot').classList.toggle('on',on)}
+  function saveHistory(){try{history.push(ctx.getImageData(0,0,canvas.width,canvas.height));if(history.length>15)history.shift()}catch{}}
+  document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));toast(tool==='draw'?'Mode menggambar':'Mode penghapus')});
+  document.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{brushColor=b.dataset.color;document.querySelectorAll('[data-color]').forEach(x=>x.classList.toggle('selected',x===b));toast('Warna kuas diganti')});
+  $('#brushSize').oninput=e=>{brushSize=+e.target.value;$('#sizeValue').textContent=brushSize};
+  $('#undoBtn').onclick=()=>{const image=history.pop();if(image){ctx.putImageData(image,0,0);toast('Satu langkah diurungkan')}};
+  $('#clearBtn').onclick=()=>{saveHistory();ctx.clearRect(0,0,canvas.width,canvas.height);toast('Kanvas dibersihkan')};
+  $('#saveBtn').onclick=()=>{const a=document.createElement('a');a.download='gambar-handcanvas.png';a.href=canvas.toDataURL('image/png');a.click()};
+  function drawAt(p){const r=wrap.getBoundingClientRect();
+    const screenX=p.x*innerWidth,screenY=p.y*innerHeight;
+    if(!isPinching){smoothedPoint=p;cursor.style.display='block';cursor.style.position='absolute';cursor.style.left=`${p.x*r.width}px`;cursor.style.top=`${p.y*r.height}px`;cursor.classList.remove('pinch');lastPoint=null;gestureAction=false;$('#coords').textContent=`${Math.round(p.x*100)}%, ${Math.round(p.y*100)}%`;return}
+    if(!lastPoint&&!gestureAction){const target=document.elementFromPoint(screenX,screenY),button=target?.closest('button');if(button){button.click();gestureAction=true;return}}
+    if(gestureAction)return;
+    // Saat mencubit, gunakan seluruh rentang gerak tangan untuk mengisi area kanvas.
+    // Filter eksponensial mengurangi getaran kecil pada ujung telunjuk.
+    const alpha=.42;smoothedPoint=!lastPoint?p:(smoothedPoint?{x:smoothedPoint.x+(p.x-smoothedPoint.x)*alpha,y:smoothedPoint.y+(p.y-smoothedPoint.y)*alpha}:p);
+    const q={x:smoothedPoint.x*r.width,y:smoothedPoint.y*r.height};cursor.style.display='block';cursor.style.position='absolute';cursor.style.left=`${q.x}px`;cursor.style.top=`${q.y}px`;cursor.classList.add('pinch');$('#coords').textContent=`${Math.round(smoothedPoint.x*100)}%, ${Math.round(smoothedPoint.y*100)}%`;
+    if(isPinching){if(!lastPoint)saveHistory();ctx.globalCompositeOperation=tool==='erase'?'destination-out':'source-over';ctx.strokeStyle=brushColor;ctx.lineWidth=tool==='erase'?brushSize*3:brushSize;
+      if(lastPoint){const mid={x:(lastPoint.x+q.x)/2,y:(lastPoint.y+q.y)/2};ctx.beginPath();ctx.moveTo(lastPoint.x,lastPoint.y);ctx.quadraticCurveTo(lastPoint.x,lastPoint.y,mid.x,mid.y);ctx.stroke();ctx.beginPath();ctx.moveTo(mid.x,mid.y);ctx.lineTo(q.x,q.y);ctx.stroke()}
+      else{ctx.beginPath();ctx.arc(q.x,q.y,ctx.lineWidth/2,0,Math.PI*2);ctx.fillStyle=brushColor;ctx.fill()}ctx.globalCompositeOperation='source-over';lastPoint=q
+    }else lastPoint=null;
+  }
+  function drawLandmarks(hand){const w=landmarkCanvas.width=video.videoWidth,h=landmarkCanvas.height=video.videoHeight;lctx.clearRect(0,0,w,h);if(!hand)return;
+    // MediaPipe Hand Landmarker landmarks: wrist + thumb, index, middle, ring, little finger chains.
+    const links=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
+    lctx.lineWidth=Math.max(3,w/180);lctx.lineCap='round';lctx.strokeStyle='#35ff8a';
+    for(const [a,b] of links){lctx.beginPath();lctx.moveTo((1-hand[a].x)*w,hand[a].y*h);lctx.lineTo((1-hand[b].x)*w,hand[b].y*h);lctx.stroke()}
+    for(let i=0;i<hand.length;i++){const p=hand[i];lctx.beginPath();lctx.arc((1-p.x)*w,p.y*h,i===0?Math.max(5,w/100):Math.max(4,w/125),0,Math.PI*2);lctx.fillStyle='#35ff8a';lctx.fill();lctx.lineWidth=Math.max(1,w/500);lctx.strokeStyle='#062414';lctx.stroke()}
+  }
+  async function loop(){if(!active)return;if(video.readyState>=2&&landmarker){const result=landmarker.detectForVideo(video,performance.now()),hand=result.landmarks?.[0];drawLandmarks(hand);if(hand){const tip=hand[8],thumb=hand[4],dist=Math.hypot(tip.x-thumb.x,tip.y-thumb.y);const pinch=isPinching?dist<.095:dist<.065;isPinching=pinch;drawAt({x:Math.max(0,Math.min(1,1-tip.x)),y:Math.max(0,Math.min(1,tip.y))});$('#hint').textContent=pinch?(gestureAction?'Alat dipilih':tool==='erase'?'Menghapus…':'Menggambar…'):'Arahkan telunjuk · cubit untuk menggambar atau pilih tombol';}else{isPinching=false;lastPoint=null;smoothedPoint=null;gestureAction=false;cursor.style.display='none';$('#coords').textContent='Tangan tidak terdeteksi';$('#hint').textContent='Tunjukkan satu tangan ke kamera';}frames++;}requestAnimationFrame(loop)}
+  $('#cameraBtn').onclick=async()=>{if(active){stream?.getTracks().forEach(t=>t.stop());active=false;video.srcObject=null;landmarker?.close();landmarker=null;$('#cameraBtn').textContent='Aktifkan kamera';$('#placeholder').style.display='grid';cursor.style.display='none';setStatus('Kamera dimatikan');return}
+    $('#cameraBtn').disabled=true;$('#cameraBtn').textContent='Memuat…';setStatus('Meminta akses kamera…');try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});video.srcObject=stream;await video.play();$('#placeholder').style.display='none';setStatus('Menyiapkan pelacakan tangan…');const vision=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');landmarker=await HandLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',delegate:'GPU'},runningMode:'VIDEO',numHands:1});active=true;$('#cameraBtn').textContent='Matikan kamera';setStatus('Kamera aktif · tangan siap dilacak',true);$('#hint').textContent='Arahkan telunjuk ke kanvas dan cubit untuk menggambar';loop()}catch(err){stream?.getTracks().forEach(t=>t.stop());active=false;$('#cameraBtn').textContent='Coba lagi';setStatus(err.name==='NotAllowedError'?'Akses kamera ditolak':err.name==='NotFoundError'?'Kamera tidak ditemukan':'Gagal mengaktifkan kamera');toast('Izinkan akses kamera dan pastikan koneksi internet tersedia.');console.error(err)}finally{$('#cameraBtn').disabled=false}};
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&active)$('#cameraBtn').click();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z')$('#undoBtn').click()});
+</script>
+</body>
+</html>

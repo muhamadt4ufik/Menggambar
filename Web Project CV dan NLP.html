@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tembak Pesawat · Computer Vision dan NLP</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f3f6ff;--card:rgba(255,255,255,.8);--ink:#0e1430;--dim:#4b5580;--a:#d9480f;--b:#0a7fa8;--line:rgba(20,30,80,.16);--star:30,40,90;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070914;--card:rgba(14,19,44,.72);--ink:#e8ecff;--dim:#9aa3d0;--a:#ff7a3d;--b:#4fe3ff;--line:rgba(140,160,255,.2);--star:200,215,255;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070914;--card:rgba(14,19,44,.72);--ink:#e8ecff;--dim:#9aa3d0;--a:#ff7a3d;--b:#4fe3ff;--line:rgba(140,160,255,.2);--star:200,215,255;color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.7 Inter,system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+#bg{position:fixed;inset:0;z-index:-1;width:100%;height:100%}
+#prog{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:3px;width:0;background:linear-gradient(90deg,var(--a),var(--b));z-index:12}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px;background:var(--card);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header b{font:700 15px "Chakra Petch",sans-serif;letter-spacing:.08em;color:var(--b);white-space:nowrap}
+nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav a{color:var(--dim);text-decoration:none;font-size:13px;padding:5px 10px;border-radius:99px;white-space:nowrap;transition:.25s}
+nav a:hover,nav a.on{color:var(--ink);background:var(--line)}
+#th{background:none;border:1px solid var(--line);color:var(--ink);border-radius:99px;width:34px;height:34px;cursor:pointer;flex:none}
+main{max-width:1040px;margin:0 auto;padding:0 20px 60px}
+.hero{min-height:84vh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 30px}
+.tag{font:500 13px "Chakra Petch",sans-serif;letter-spacing:.3em;color:var(--a);text-transform:uppercase}
+h1{font:700 clamp(40px,9vw,92px)/1 "Chakra Petch",sans-serif;margin:14px 0;letter-spacing:-.01em}
+h1 span{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-70deg);animation:ch .7s cubic-bezier(.2,.9,.3,1.2) forwards}
+h1 .g{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes ch{to{opacity:1;transform:none}}
+.type{font:500 clamp(18px,3vw,26px) "Chakra Petch",sans-serif;color:var(--b);min-height:1.6em}
+.type::after{content:"";display:inline-block;width:2px;height:1em;background:var(--a);margin-left:4px;vertical-align:-.15em;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.lead{max-width:680px;color:var(--dim);font-size:17px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:34px 0 0}
+.st{background:var(--card);border:1px solid var(--line);border-radius:4px 20px 4px 20px;padding:16px 18px;backdrop-filter:blur(8px)}
+.st b{display:block;font:700 34px "Chakra Petch",sans-serif;color:var(--a)}
+.st small{color:var(--dim);font-size:13px}
+section{padding:56px 0 8px}
+h2{font:700 clamp(26px,4.5vw,40px) "Chakra Petch",sans-serif;margin:0 0 6px}
+h2 i{font-style:normal;color:var(--a);margin-right:10px}
+h3{font:700 19px "Chakra Petch",sans-serif;color:var(--b);margin:22px 0 6px}
+p{margin:8px 0;color:var(--dim)}
+p b,li b{color:var(--ink)}
+code{font:500 .88em ui-monospace,monospace;background:var(--line);padding:1px 6px;border-radius:5px;color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px 22px 4px 22px;padding:22px 24px;margin:16px 0;backdrop-filter:blur(10px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+[data-r]{opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1);transition-delay:var(--d,0s)}
+[data-r].in{opacity:1;transform:none}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--dim)}
+th{color:var(--b);font:700 13px "Chakra Petch",sans-serif;letter-spacing:.1em;text-transform:uppercase}
+td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+tr:last-child td{border:0}
+tbody tr{transition:background .25s}tbody tr:hover{background:var(--line)}
+.demo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;align-items:center}
+svg.hand{width:100%;max-width:340px;margin:auto;display:block}
+.pt{fill:var(--b);transition:fill .2s}.lk{stroke:var(--line);stroke-width:2}.dl{stroke:var(--a);stroke-width:2.5;stroke-dasharray:5 4;animation:dash 1s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-18}}
+.closed .pt.t{fill:var(--a)}.closed .dl{stroke:#38d97a}
+input[type=range]{width:100%;accent-color:var(--a)}
+.badge{display:inline-block;font:700 14px "Chakra Petch",sans-serif;padding:5px 14px;border-radius:99px;border:1px solid var(--line);color:var(--dim);transition:.3s}
+.closed~.x,.badge.ok{color:#0b2a14;background:#38d97a;border-color:#38d97a}
+.flow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.fn{flex:1 1 130px;text-align:center;padding:14px 8px;border:1px solid var(--line);border-radius:12px;font:700 14px "Chakra Petch",sans-serif;color:var(--dim);transition:.4s;background:var(--card)}
+.fn.on{color:var(--ink);border-color:var(--a);box-shadow:0 0 22px -4px var(--a);transform:translateY(-5px)}
+.fn small{display:block;font:400 11.5px Inter,sans-serif;margin-top:2px}
+.ar{color:var(--a);font-size:18px}
+.chat{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chat input{flex:1 1 200px;font:inherit;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.b,.chip{font:700 14px "Chakra Petch",sans-serif;cursor:pointer;border:0;border-radius:4px 14px 4px 14px;padding:11px 20px;background:var(--a);color:#1a0c04}
+.chip{background:transparent;border:1px solid var(--line);color:var(--dim);padding:5px 12px;border-radius:99px;font-size:12.5px}
+.chip:hover{color:var(--ink);border-color:var(--b)}
+#ans{min-height:3.2em;margin-top:12px;padding:12px 14px;border-left:3px solid var(--b);background:var(--line);border-radius:0 10px 10px 0;color:var(--ink)}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:20px 0;position:relative}
+ol.steps::before{content:"";position:absolute;left:19px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--a),var(--b))}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 22px 60px;color:var(--dim)}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:700 16px "Chakra Petch",sans-serif;background:var(--bg);border:2px solid var(--a);color:var(--a)}
+ul{padding-left:20px;color:var(--dim)}li{margin:5px 0}
+.refs a{color:var(--b);word-break:break-all}
+.note{border-left:3px solid var(--a)}
+footer{text-align:center;color:var(--dim);font-size:13px;padding:30px 20px 50px;border-top:1px solid var(--line)}
+@media(max-width:640px){header b{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}[data-r],h1 span{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas><div id="prog"></div>
+<header><b>TEMBAK PESAWAT</b>
+<nav id="nav"><a href="#teori">Teori</a><a href="#game">Penerapan</a><a href="#model">Model</a><a href="#buat">Pembuatan</a><a href="#perangkat">Perangkat</a><a href="#akses">Internet dan HP</a><a href="#pakai">Kamera dan Mikrofon</a><a href="#batas">Kesimpulan</a></nav>
+<button id="th" aria-label="Ganti tema">◐</button></header>
+<main>
+<div class="hero">
+<div class="tag" data-r>Proyek Pembuatan Game Yang Menerapkan COMPUTER VISION dan NLP· 3 November 2026</div>
+<h1 id="ttl" aria-label="Game Tembak Pesawat Interaktif2"></h1>
+<div class="type" id="ty" data-r style="--d:.4s"></div>
+<p class="lead" data-r style="--d:.6s">Game tembak pesawat 3D dalam satu file HTML. Game ini menerapkan teknologi computer vision dan NLP. dimana Pesawat dikendalikan mouse, layar sentuh, keyboard, atau ujung telunjuk yang dilacak kamera. Pemain juga bisa bertanya lewat suara, lalu pilot menjawab dengan suara.</p>
+<div class="stats">
+<div class="st" data-r style="--d:.7s"><b data-n="21">0</b><small>landmark tangan MediaPipe</small></div>
+<div class="st" data-r style="--d:.8s"><b data-n="0.22" data-f="2">0</b><small>rasio ambang cubitan</small></div>
+<div class="st" data-r style="--d:.9s"><b data-n="5">0</b><small>frame stabil untuk cubitan</small></div>
+<div class="st" data-r style="--d:1s"><b data-n="1">0</b><small>tangan dilacak (modelComplexity 0)</small></div>
+</div></div>
+
+<section id="ringkasan"><h2 data-r><i>01</i>Ringkasan</h2>
+<div class="card" data-r><p>Proyek ini mengembangkan game tembak pesawat 3D berbasis satu file HTML. Setelah permainan dimulai, pemain dapat menekan tombol <b>Bertanya</b>, mengucapkan pertanyaan tentang permainan, lalu menerima jawaban yang dibacakan browser.</p>
+<p><b>Computer vision</b> memakai MediaPipe Hands untuk menemukan landmark tangan dan mengenali gerakan cubit. <b>NLP</b> berupa klasifikasi maksud berbasis kata kunci setelah ucapan diubah menjadi teks oleh Web Speech API. Tidak ada model NLP besar atau model YOLO di dalam proyek.</p></div>
+<h3 data-r>Tujuan dan ruang lingkup</h3>
+<p data-r>Tujuannya menggabungkan game 3D dengan interaksi kamera dan bahasa alami sederhana. Laporan ini membahas teori, implementasi, model dan API, langkah pembuatan, perangkat, kebutuhan internet, penggunaan di HP, serta cara memakai kamera dan mikrofon.</p></section>
+
+<section id="teori"><h2 data-r><i>02</i>Teori yang digunakan</h2>
+<div class="grid">
+<div class="card" data-r><h3 style="margin-top:0">Computer vision</h3><p>Computer vision memungkinkan komputer menafsirkan gambar atau video. Kamera menghasilkan rangkaian frame. Model deteksi tangan menemukan area telapak, lalu model landmark memperkirakan titik sendi dan ujung jari. MediaPipe Hands mengeluarkan <b>21 landmark</b> dengan koordinat yang dinormalisasi terhadap ukuran gambar [1, 2].</p><p>Gerakan cubit ditentukan dari jarak ujung ibu jari dan telunjuk dibandingkan ukuran telapak, sehingga ambang tetap stabil ketika tangan mendekat atau menjauh dari kamera.</p></div>
+<div class="card" data-r style="--d:.12s"><h3 style="margin-top:0">Natural Language Processing</h3><p>NLP adalah teknik untuk mengolah bahasa manusia. Alurnya: pengenalan ucapan, pengenalan maksud, penyusunan jawaban, lalu text-to-speech. Pengenalan ucapan dan sintesis suara disediakan browser lewat Web Speech API [3].</p><p>Bagian NLP khusus game memakai aturan dan pencocokan kata kunci, bukan model machine learning bahasa. Pertanyaan dikelompokkan ke maksud seperti skor, nyawa, level senjata, bos, atau tips.</p></div></div>
+<div class="card" data-r><h3 style="margin-top:0">Coba sendiri: deteksi cubitan</h3>
+<div class="demo" id="pinch"><svg class="hand" viewBox="0 0 300 200" aria-label="Simulasi jarak ibu jari dan telunjuk">
+<line class="lk" x1="60" y1="170" x2="110" y2="100"/><line class="lk" x1="110" y1="100" x2="190" y2="50"/>
+<line id="dl" class="dl" x1="190" y1="50" x2="150" y2="50"/>
+<circle class="pt" cx="60" cy="170" r="7"/><circle class="pt" cx="110" cy="100" r="7"/><circle class="pt" cx="190" cy="50" r="9"/><circle id="tp" class="pt t" cx="150" cy="50" r="9"/>
+<text x="68" y="190" fill="currentColor" font-size="10" opacity=".6">0 pergelangan</text><text x="118" y="116" fill="currentColor" font-size="10" opacity=".6">9 pangkal jari tengah</text><text x="168" y="34" fill="currentColor" font-size="10" opacity=".6">8 telunjuk</text></svg>
+<div><p>Geser untuk mengubah jarak ibu jari (4) ke telunjuk (8), dibagi jarak titik 0 ke 9.</p>
+<input id="rg" type="range" min="5" max="70" value="50" aria-label="Rasio cubit">
+<p>Rasio: <b id="rv">0.50</b> <span class="badge" id="bd">Terbuka</span></p>
+<p style="font-size:13px">Cubitan terdeteksi di bawah 0,22 selama lima frame. Jari harus terbuka melewati 0,36 sebelum cubitan berikutnya dikenali (histeresis).</p></div></div></div></section>
+
+<section id="game"><h2 data-r><i>03</i>Penerapan pada game</h2>
+<div class="card" data-r>
+<h3 style="margin-top:0">Mainkan game</h3>
+<p>Game Tembak Pesawat dapat dimainkan langsung di bawah ini. Izinkan akses kamera dan mikrofon pada browser jika ingin mencoba kendali tangan dan fitur Bertanya.</p>
+<div style="overflow:hidden;border:1px solid var(--line);border-radius:14px;background:#070914">
+<iframe src="tembak-pesawat-CV_NLP.html" title="Game Tembak Pesawat Computer Vision dan NLP" allow="camera; microphone; autoplay" loading="lazy" style="display:block;width:100%;height:min(78vh,760px);min-height:620px;border:0"></iframe>
+</div>
+<p style="font-size:13px">Jika game tidak tampil, <a href="tembak-pesawat-CV_NLP.html" target="_blank" rel="noopener">buka game di tab baru</a>.</p>
+</div>
+<h3 data-r>Kendali dengan kamera</h3>
+<div class="card" data-r><ul><li>Halaman meminta izin lewat <code>getUserMedia</code> dan menampilkan pratinjau kamera kecil.</li>
+<li>MediaPipe memproses satu tangan dengan <code>modelComplexity 0</code>, <code>minDetectionConfidence 0.65</code>, dan <code>minTrackingConfidence 0.55</code>.</li>
+<li>Ujung telunjuk (landmark 8) diterjemahkan ke target pesawat. Arah horizontal dibalik agar terasa seperti cermin, dan posisi dibatasi di area permainan.</li>
+<li>Kerangka tangan digambar dengan garis dan titik hijau pada pratinjau.</li>
+<li>Cubitan memilih tombol di layar menu serta menjeda atau melanjutkan permainan.</li>
+<li>Tembakan berlangsung otomatis. Mouse, sentuhan, tombol panah, dan WASD tetap tersedia.</li></ul></div>
+<h3 data-r>Tanya pilot dengan bahasa</h3>
+<p data-r>Tombol Bertanya memulai pengenalan ucapan satu kali dalam Bahasa Indonesia (id-ID). Jika maksud tidak dikenali, pilot menyebutkan jenis pertanyaan yang bisa dijawab. Jawaban dibacakan lewat <code>SpeechSynthesisUtterance</code>, mengikuti suara id-ID yang tersedia di browser dan sistem operasi.</p>
+<div class="card" data-r><div class="flow" id="flow">
+<div class="fn">Ucapan<small>suara pemain</small></div><span class="ar">→</span><div class="fn">Teks<small>speech-to-text</small></div><span class="ar">→</span><div class="fn">Maksud<small>regex dan kata kunci</small></div><span class="ar">→</span><div class="fn">Jawaban<small>data game terbaru</small></div><span class="ar">→</span><div class="fn">Suara<small>text-to-speech</small></div></div>
+<p>Simulasi di bawah memakai data contoh, bukan data dari game yang sedang berjalan.</p>
+<div class="chat"><input id="q" placeholder="Ketik pertanyaan, mis. berapa nyawa" aria-label="Pertanyaan"><button class="b" id="ask">Tanya</button></div>
+<div class="chat" id="chips"><button class="chip">tampilkan skor terbaik</button><button class="chip">berapa nyawa</button><button class="chip">level senjata berapa</button><button class="chip">bagaimana kondisi bos</button><button class="chip">beri tips</button></div>
+<div id="ans" aria-live="polite">Jawaban pilot muncul di sini.</div></div></section>
+
+<section id="model"><h2 data-r><i>04</i>Model dan pustaka</h2>
+<div class="tbl" data-r><table><thead><tr><th>Bagian</th><th>Yang digunakan</th><th>Peran</th></tr></thead><tbody>
+<tr><td>Computer vision</td><td>MediaPipe Hands JavaScript Solution, paket @mediapipe/hands</td><td>Deteksi dan pelacakan tangan dengan 21 landmark. Kompleksitas model 0, maksimum satu tangan.</td></tr>
+<tr><td>Ucapan ke teks</td><td>Web Speech API SpeechRecognition milik browser</td><td>Mentranskripsikan pertanyaan Bahasa Indonesia. Browser menentukan mesinnya; proyek tidak menyertakan bobot model ASR.</td></tr>
+<tr><td>Pemahaman maksud</td><td>Aturan regex dan kata kunci JavaScript</td><td>Menggolongkan pertanyaan: skor terbaik, skor, nyawa, senjata, bos, tips, atau jawaban cadangan. Bukan model NLP terlatih.</td></tr>
+<tr><td>Jawaban suara</td><td>Web Speech API SpeechSynthesisUtterance</td><td>Mengubah teks menjadi suara Bahasa Indonesia jika suara id-ID tersedia.</td></tr>
+<tr><td>Grafik game</td><td>Three.js r128 dan WebGLRenderer</td><td>Merender pesawat, musuh, latar ruang angkasa, proyektil, efek, dan HUD.</td></tr></tbody></table></div>
+<div class="card note" data-r><p><b>MediaPipe Hands bukan YOLO.</b> YOLO umumnya mendeteksi objek dalam kotak pembatas. Proyek ini memakai landmark tangan untuk memperoleh koordinat jari dan telapak, lewat tahap deteksi telapak lalu pelacakan landmark [1, 2].</p></div></section>
+
+<section id="buat"><h2 data-r><i>05</i>Cara membuat proyek</h2>
+<ol class="steps">
+<li data-r><b>Siapkan struktur HTML.</b> Antarmuka game, kanvas Three.js, HUD, menu, tombol kamera, dan tombol Bertanya.</li>
+<li data-r><b>Muat pustaka dari CDN.</b> Three.js dan MediaPipe Hands. Buat adegan 3D, kamera, renderer, pesawat, musuh, peluru, efek, dan loop animasi.</li>
+<li data-r><b>Aktifkan kamera.</b> Panggil <code>getUserMedia</code>, inisialisasi Hands, kirim frame lewat <code>hands.send</code>, lalu pakai <code>multiHandLandmarks</code> untuk gerak pesawat dan overlay hijau.</li>
+<li data-r><b>Hitung rasio cubit.</b> Gunakan ambang tutup dan buka yang berbeda, serta beberapa frame stabil agar gerakan sesaat tidak memicu aksi.</li>
+<li data-r><b>Tambahkan tombol Bertanya.</b> Mulai SpeechRecognition satu kali dengan <code>id-ID</code>, ubah transkrip menjadi intent, susun jawaban dari skor, nyawa, senjata, dan bos, lalu bacakan lewat <code>speechSynthesis</code>.</li>
+<li data-r><b>Simpan dan publikasikan.</b> Skor terbaik disimpan di <code>localStorage</code>. Untuk publikasi, unggah ke hosting HTTPS seperti GitHub Pages.</li></ol></section>
+
+<section id="perangkat"><h2 data-r><i>06</i>Spesifikasi perangkat</h2>
+<p data-r>Hanya informasi yang terkonfirmasi dari sesi pengembangan dan tangkapan layar pengaturan Chrome yang dicantumkan. Model CPU, RAM, GPU, dan kamera tidak dapat dibaca dari lingkungan laporan, jadi tidak ditebak.</p>
+<div class="tbl" data-r><table><thead><tr><th>Komponen</th><th>Informasi terkonfirmasi</th></tr></thead><tbody>
+<tr><td>Komputer</td><td>PC Dell (model perangkat belum tercatat)</td></tr>
+<tr><td>Sistem operasi</td><td>Windows Pro; informasi sistem melaporkan Windows 10 Pro, build 26200</td></tr>
+<tr><td>Browser</td><td>Google Chrome (nomor versi belum tercatat)</td></tr>
+<tr><td>Input audio</td><td>Microphone Array (Realtek) terpilih di pengaturan Chrome</td></tr>
+<tr><td>Kamera</td><td>Kamera PC digunakan untuk game; merek dan resolusi belum tercatat</td></tr>
+<tr><td>CPU / RAM / GPU</td><td>Belum tercatat. Lihat Settings &gt; System &gt; About, Task Manager &gt; Performance, atau jalankan dxdiag.</td></tr></tbody></table></div>
+<p data-r>Kebutuhan fungsional: browser dengan WebGL, kamera untuk kontrol tangan, mikrofon untuk pertanyaan lisan, serta speaker atau headphone. Proyek belum memiliki hasil benchmark lintas perangkat.</p></section>
+
+<section id="akses"><h2 data-r><i>07</i>Internet dan HP</h2>
+<div class="grid">
+<div class="card" data-r><h3 style="margin-top:0">Kebutuhan internet</h3><p>Game tidak sepenuhnya offline. Three.js, MediaPipe Hands, dan font dimuat dari CDN, sehingga internet diperlukan saat halaman dibuka. Pengenalan ucapan Chrome dapat memakai layanan server dan tidak berfungsi offline secara bawaan [3].</p><p>Untuk versi offline, semua pustaka dan model harus disertakan lokal, dan pengenalan ucapan diganti mesin offline.</p></div>
+<div class="card" data-r style="--d:.12s"><h3 style="margin-top:0">Menjalankan di HP</h3><p>Game dapat dicoba lewat GitHub Pages karena memakai HTTPS. Layar sentuh berfungsi sebagai input pointer, dan kamera depan dapat dipakai jika izin diberikan. Mode potret atau perangkat berspesifikasi rendah dapat menurunkan kelancaran.</p><p>Fitur Bertanya paling mungkin berjalan di Chrome dengan koneksi internet. Uji langsung di perangkat tujuan sebelum publikasi final.</p></div></div></section>
+
+<section id="pakai"><h2 data-r><i>08</i>Kamera dan mikrofon</h2>
+<div class="grid">
+<div class="card" data-r><h3 style="margin-top:0">Kamera untuk kendali</h3><ul><li>Buka lewat localhost, HTTPS, atau GitHub Pages, lalu izinkan kamera. Izin dapat diatur per situs [4].</li><li>Arahkan telunjuk ke kamera; pesawat mengikuti ujung telunjuk.</li><li>Cubit ibu jari dan telunjuk untuk memilih menu atau menjeda dan melanjutkan.</li><li>Klik <b>Gunakan keyboard</b> untuk mematikan kamera dan beralih ke panah atau WASD.</li></ul></div>
+<div class="card" data-r style="--d:.12s"><h3 style="margin-top:0">Mikrofon untuk bertanya</h3><ul><li>Klik <b>Bertanya</b> saat bermain atau di layar hasil. Mikrofon baru mendengarkan setelah tombol ditekan.</li><li>Ucapkan satu pertanyaan, misalnya “tampilkan skor terbaik”, “berapa nyawa”, “senjata level berapa”, atau “beri tips”.</li><li>Pilih <i>Allow while visiting the site</i> agar izin berlaku pada kunjungan berikutnya di origin yang sama.</li><li>Pastikan mikrofon yang benar dipilih di pengaturan Chrome.</li></ul></div></div></section>
+
+<section id="batas"><h2 data-r><i>09</i>Batasan dan kesimpulan</h2>
+<div class="card" data-r><p>Proyek ini menunjukkan integrasi computer vision dan NLP sederhana dalam satu game browser. MediaPipe Hands menyediakan koordinat jari untuk kendali dan visualisasi tangan. Web Speech API menangani pengenalan ucapan dan pembacaan jawaban, sementara logika NLP game mencocokkan intent dengan aturan yang mudah diperiksa.</p>
+<p>Karena intent memakai kata kunci, variasi kalimat yang tidak cocok menghasilkan jawaban cadangan. SpeechRecognition memiliki dukungan browser terbatas dan, di Chrome, dapat bergantung pada layanan daring [3].</p></div></section>
+
+<section id="ref"><h2 data-r><i>10</i>Referensi</h2>
+<div class="card refs" data-r>
+<p>[1] Google AI Edge, Hand landmarks detection guide<br><a href="https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker">developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker</a></p>
+<p>[2] Google AI Edge, MediaPipe Hands solution documentation<br><a href="https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/hands.md">github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/hands.md</a></p>
+<p>[3] MDN Web Docs, SpeechRecognition dan Web Speech API<br><a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition</a></p>
+<p>[4] Google Chrome Help, Use your camera and microphone in Chrome<br><a href="https://support.google.com/chrome/answer/2693767">support.google.com/chrome/answer/2693767</a></p>
+<p>[5] Three.js Documentation, WebGLRenderer<br><a href="https://threejs.org/docs/pages/WebGLRenderer.html">threejs.org/docs/pages/WebGLRenderer.html</a></p></div></section>
+</main>
+<footer>Game interaktif berbasis Computer Vision dan NLP · Laporan Proyek Tembak Pesawat</footer>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+// judul per huruf
+var t=$('ttl'),words=[['Game','Tembak'],['Pesawat','Interaktif']],k=0;
+words.forEach(function(w,wi){w.forEach(function(x,xi){var s=document.createElement('span');if(wi||xi>0)s.className=wi?'g':'';
+ s.style.animationDelay=(.15*k++)+'s';s.textContent=x;t.appendChild(s);t.appendChild(document.createTextNode(' '));});
+ if(!wi)t.appendChild(document.createElement('br'));});
+t.querySelectorAll('span').forEach(function(s,i){if(i>1)s.className='g'});
+// mesin ketik
+var ph=['Computer Vision dengan MediaPipe Hands','Natural Language Processing berbahasa Indonesia','Grafik 3D dengan Three.js','Kendali telunjuk dan tanya pilot'],pi=0,ci=0,del=0,ty=$('ty');
+function tick(){var s=ph[pi];ci+=del?-1:1;ty.textContent=s.slice(0,ci);var d=del?25:55;
+ if(!del&&ci===s.length){del=1;d=1700}else if(del&&ci===0){del=0;pi=(pi+1)%ph.length;d=350}setTimeout(tick,rm?0:d);}
+if(rm)ty.textContent=ph[0];else tick();
+// reveal, hitung angka, nav aktif
+var io=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);
+ var n=x.target.querySelector&&x.target.querySelector('[data-n]');if(n)count(n);}})},{threshold:.12});
+document.querySelectorAll('[data-r]').forEach(function(e){io.observe(e)});
+function count(n){var v=parseFloat(n.dataset.n),f=+n.dataset.f||0,s=performance.now();
+ (function st(now){var p=Math.min(1,(now-s)/1400),e=1-Math.pow(1-p,3);n.textContent=(v*e).toFixed(f).replace('.',',');if(p<1&&!rm)requestAnimationFrame(st);else n.textContent=v.toFixed(f).replace('.',',');})(s);}
+var links=[].slice.call(document.querySelectorAll('nav a')),secs=links.map(function(a){return $(a.hash.slice(1))});
+addEventListener('scroll',function(){var h=document.documentElement,sc=h.scrollTop||document.body.scrollTop;
+ $('prog').style.width=(sc/(h.scrollHeight-h.clientHeight)*100)+'%';var cur=-1;
+ secs.forEach(function(s,i){if(s&&s.getBoundingClientRect().top<innerHeight*.4)cur=i});
+ links.forEach(function(a,i){a.classList.toggle('on',i===cur)});},{passive:true});
+// tema
+$('th').onclick=function(){var r=document.documentElement,d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark';};
+// simulasi cubitan
+var closed=false,P=86;
+$('rg').oninput=function(){var r=this.value/100;
+ if(!closed&&r<.22)closed=true;else if(closed&&r>.36)closed=false;
+ $('tp').setAttribute('cx',190-r*P);$('dl').setAttribute('x2',190-r*P);$('rv').textContent=r.toFixed(2);
+ $('pinch').classList.toggle('closed',closed);var b=$('bd');b.classList.toggle('ok',closed);
+ b.textContent=closed?'Cubitan terdeteksi':(r<.36?'Menunggu jari terbuka (>0,36)':'Terbuka');};
+$('rg').oninput();
+// alur NLP
+var fn=[].slice.call(document.querySelectorAll('.fn')),fi=0;
+setInterval(function(){fn.forEach(function(f,i){f.classList.toggle('on',i===fi)});fi=(fi+1)%fn.length;},1100);
+// simulasi maksud
+var R=[[/skor.*(terbaik|tertinggi|rekor)|rekor/,'Skor terbaik','Skor terbaik kamu saat ini 4.250 poin.'],[/skor|poin|nilai/,'Skor','Skor kamu sekarang 1.800 poin.'],[/nyawa|hidup|darah/,'Nyawa','Nyawamu tersisa dua.'],[/senjata|level|tembak/,'Senjata','Senjatamu level 3, tembakan lima arah.'],[/bos|boss|raja/,'Bos','Raja Vakrath masih memiliki 64 persen energi.'],[/tips|saran|bantu/,'Tips','Hindari tembakan bos dan ambil power-up untuk menaikkan level senjata.']];
+function ask(q){q=q.toLowerCase();var m=R.filter(function(r){return r[0].test(q)})[0],a=$('ans');
+ var txt=m?'Maksud: '+m[1]+'. '+m[2]:'Maksud: tidak dikenali. Aku bisa menjawab soal skor, nyawa, senjata, bos, dan tips.';a.textContent='';var i=0;
+ (function w(){a.textContent=txt.slice(0,++i);if(i<txt.length&&!rm)setTimeout(w,16);else a.textContent=txt;})();}
+$('ask').onclick=function(){ask($('q').value)};$('q').onkeydown=function(e){if(e.key==='Enter')ask(this.value)};
+document.querySelectorAll('.chip').forEach(function(c){c.onclick=function(){$('q').value=c.textContent;ask(c.textContent)}});
+// latar bintang
+var cv=$('bg'),cx=cv.getContext('2d'),S=[],W,H,sy=0;
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;S=[];for(var i=0;i<130;i++)S.push({x:Math.random()*W,y:Math.random()*H,z:Math.random()*.9+.1});}
+addEventListener('resize',rs);rs();addEventListener('scroll',function(){sy=scrollY},{passive:true});
+function fr(){cx.clearRect(0,0,W,H);var c=getComputedStyle(document.documentElement).getPropertyValue('--star').trim();
+ S.forEach(function(s){s.y+=s.z*.35;if(s.y>H)s.y=0;var y=(s.y-sy*s.z*.25)%H;if(y<0)y+=H;cx.fillStyle='rgba('+c+','+(.25+s.z*.6)+')';cx.fillRect(s.x,y,s.z*2,s.z*2);});
+ if(!rm)requestAnimationFrame(fr);}
+fr();
+})();
+</script>
+</body>
+</html>
